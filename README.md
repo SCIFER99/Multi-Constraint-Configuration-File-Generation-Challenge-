@@ -1,2 +1,13 @@
 # Multi-Constraint-Configuration-File-Generation-Challenge-
 This was a sequence to sequence challenge regarding converting natural language requirements into specific configuration constraints.
+
+# Multi-Constraint Configuration File Generation
+
+Infrastructure teams maintain structured configuration files that must simultaneously satisfy multiple formal requirements. Converting natural language requirements into compliant configurations requires parsing specific values from noisy text, inferring the correct output schema, and satisfying constraints that are not all explicitly enumerated. This challenge tests whether an agent can learn the mapping between natural language specifications and formal constraints from labeled training data, then apply that understanding to new specifications where the constraints are hidden. Each specification is a paragraph of natural language describing a desired Kubernetes resource with embedded requirements for names, namespaces, images, ports, replicas, labels, environment variables, and other properties. Specifications are written in varied paragraph styles with diverse phrasing, and approximately 35% contain distractor sentences about project context, team contacts, or migration history that carry no configuration relevance and must be filtered out. The training set provides 1,200 examples where the specification, formal constraint set, and ground-truth configuration are all visible. The test set provides 300 specifications with no constraints or configurations. The resource type (Deployment, Service, Pod, ConfigMap, Ingress, or CronJob) is given in training data but must be inferred from specification text at test time. The agent must generate a valid Kubernetes YAML configuration for each test specification that satisfies the hidden evaluation constraints.
+
+# The key challenges are:
+
+* Information asymmetry: training data reveals which paths and values are constrained, but test data hides this entirely, requiring the agent to predict which properties will be evaluated
+* Schema inference: the output structure differs significantly across six resource types (e.g., Deployments nest containers under spec.template.spec while CronJobs add a jobTemplate wrapper), and the agent must determine the correct schema from natural language alone
+* Noise filtering: distractor sentences must be identified and ignored to avoid generating spurious YAML fields
+Value extraction under phrasing variation: the same property (e.g., replica count) may be expressed as "scaled to 3 instances", "with 3 replicas", "maintaining 3 pods", or "running 3 copies", and the agent must extract the correct value regardless of phrasing
